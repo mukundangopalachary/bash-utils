@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+output_file=""
+input_file=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  -o | --output)
+    output_file="$2"
+    shift 2
+    ;;
+  *)
+    input_file="$1"
+    shift
+    ;;
+  esac
+done
+
+# Added space after [[
+if [[ -n "$input_file" && -n "$output_file" ]]; then
+  if [[ -f "$output_file" ]]; then
+    cp "$output_file" "$output_file.bak"
+  fi
+  cp "$input_file" "$output_file"
+fi

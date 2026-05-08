@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+IFS=":" read -ra paths <<<"$PATH"
+number=1
+
+for p in "${paths[@]}"; do
+  echo "$((number++)). $p"
+done

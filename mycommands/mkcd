@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+mkcd() {
+  dirName="$1"
+  mkdir "$dirName"
+  cd "$dirName" || return
+}
