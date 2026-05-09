@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+up() {
+  local levels path i
+
+  if [[ $# -ne 1 ]]; then
+    echo "usage: up <positive-number>" >&2
+    return 2
+  fi
+
+  if ! [[ "$1" =~ ^[0-9]+$ ]]; then
+    echo "up: argument must be a positive integer" >&2
+    return 3
+  fi
+
+  levels="$1"
+  if ((levels <= 0)); then
+    echo "up: number must be greater than 0" >&2
+    return 4
+  fi
+  path=""
+
+  for ((i = 0; i < levels; i++)); do
+    path+="../"
+  done
+  if ! cd "$path"; then
+    echo "up: failed to change directory" >&2
+    return 5
+  fi
+
+  return 0
+}
