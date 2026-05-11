@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+repo() {
+  local path url provider repo
+
+  if ! [[ $# -eq 1 ]]; then
+    echo "usage: there can be only one arguement" >&2
+    return 2
+  fi
+
+  if [[ -d "$1" ]]; then
+    path="$1"
+  else
+    echo "$1: No such file or directory" >&2
+    return 3
+  fi
+
+  if ! (cd "$path" && git rev-parse --is-inside-work-tree &>/dev/null); then
+    echo "fatal: not a git repository (or any of the parent directories): .git" >&2
+    return 4
+  fi
+
+  # Use command grouping to avoid subshell
+  if ! url=$({ cd "$path" && git remote get-url origin; } 2>/dev/null); then
+    echo "fatal: 'origin' does not appear to be a git repository" >&2
+    return 5
+  fi
+
+  provider=$(git -C "$path" remote get-url origin | awk -F'[@:/]' '{print $(NF-2)}')
+  repo=$(basename "$url" .git)
+
+  echo "$provider"
+  echo "$repo"
+
+  return 0
+}
