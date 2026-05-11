@@ -1,25 +1,68 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+backup_dir="$HOME/.backup"
+
 output_file=""
 input_file=""
 
+usage() {
+  echo "Usage: $0 <input_file> -o <output_file>"
+  exit 1
+}
+
+# Parse arguments
 while [[ $# -gt 0 ]]; do
-  case $1 in
-  -o | --output)
-    output_file="$2"
-    shift 2
-    ;;
-  *)
-    input_file="$1"
-    shift
-    ;;
+  case "$1" in
+    -o|--output)
+      [[ $# -lt 2 ]] && usage
+      output_file="$2"
+      shift 2
+      ;;
+    *)
+      input_file="$1"
+      shift
+      ;;
   esac
 done
 
-# Added space after [[
-if [[ -n "$input_file" && -n "$output_file" ]]; then
-  if [[ -f "$output_file" ]]; then
-    cp "$output_file" "$output_file.bak"
-  fi
-  cp "$input_file" "$output_file"
+# Validate inputs
+[[ -z "$input_file" || -z "$output_file" ]] && usage
+
+if [[ ! -f "$input_file" ]]; then
+  echo "Error: Input file does not exist: $input_file"
+  exit 1
 fi
+
+# Create backup directory securely
+mkdir -p "$backup_dir"
+chmod 700 "$backup_dir"
+
+# Extract safe filenames
+input_base=$(basename "$input_file")
+output_base=$(basename "$output_file")
+
+timestamp=$(date +"%Y%m%d_%H%M%S")
+
+# Backup existing output file if it exists
+if [[ -f "$output_file" ]]; then
+  cp -- "$output_file" \
+    "$backup_dir/${output_base}.${timestamp}.bak"
+
+  echo "Backed up existing output file:"
+  echo "  $backup_dir/${output_base}.${timestamp}.bak"
+fi
+
+# Example operation:
+# Copy input -> output
+cp -- "$input_file" "$output_file"
+
+# Backup original input file
+cp -- "$input_file" \
+  "$backup_dir/${input_base}.${timestamp}.bak"
+
+echo "Backed up input file:"
+echo "  $backup_dir/${input_base}.${timestamp}.bak"
+
+echo "Operation completed successfully."
