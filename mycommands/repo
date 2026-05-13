@@ -29,8 +29,8 @@ repo() {
   provider=$(git -C "$path" remote get-url origin | awk -F'[@:/]' '{print $(NF-2)}')
   repo=$(basename "$url" .git)
 
-  echo "$provider"
-  echo "$repo"
+  echo "provider: $provider"
+  echo "name: $repo"
 
   return 0
 }

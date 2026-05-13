@@ -30,3 +30,7 @@ up() {
 
   return 0
 }
+
+whatev () {
+  echo "/n"
+}
